@@ -32,9 +32,9 @@ grid = Grid(WIDTH, HEIGHT)
 def update_pixel(x, y):
     if grid.is_empty(x, y+1):
         grid.swap(x, y, x, y+1)
-    elif grid.is_empty(x-1, y+1):
+    elif  x - 1 >= 0 and grid.is_empty(x-1, y+1):
         grid.swap(x, y, x-1, y+1)
-    elif grid.is_empty(x+1, y+1):
+    elif x + 1 <= WIDTH - 1 and grid.is_empty(x+1, y+1):
         grid.swap(x, y, x+1, y+1)
 
 pygame.init()
@@ -62,7 +62,7 @@ while running:
             grid.set(x, y, pygame.Color("white"))
 
     for col in range(grid.width - 2, -1, -1):
-        for row in range(grid.height - 2, 0, -1):
+        for row in range(grid.height - 1, -1, -1):
             update_pixel(row, col)
 
     for col in range(grid.width):
