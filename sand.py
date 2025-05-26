@@ -1,4 +1,6 @@
 import pygame
+import random
+import colorsys
 
 class Grid:
     def __init__(self, width, height):
@@ -26,6 +28,7 @@ class Grid:
 
 WIDTH = 200
 HEIGHT = 160
+SAND_HSL = (39, 51, 59)
 
 grid = Grid(WIDTH, HEIGHT)
 
@@ -37,8 +40,18 @@ def update_pixel(x, y):
     elif x + 1 <= WIDTH - 1 and grid.is_empty(x+1, y+1):
         grid.swap(x, y, x+1, y+1)
 
-pygame.init()
+def vary_color(h, s, l):
+    # saturation variation
+    s += random.randint(-20, 0)
+    s = max(0, min(100, s))
 
+    # lightness variation
+    l += random.randint(-10, 10)
+    l = max(0, min(100, l))
+
+    # hsl to rgb convertion
+    r, g, b = colorsys.hls_to_rgb(h / 360, l / 100, s / 100)
+    return round(r * 255), round(g * 255), round(b * 255)
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("sand")
@@ -53,13 +66,13 @@ while running:
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             if WIDTH > event.pos[0] >= 0 and HEIGHT > event.pos[1] >= 0:
-                grid.set(event.pos[0], event.pos[1], pygame.Color("white"))
+                grid.set(event.pos[0], event.pos[1], vary_color(*SAND_HSL))
 
     mouse_buttons = pygame.mouse.get_pressed()
     if mouse_buttons[0]:
         (x, y) = pygame.mouse.get_pos()
         if WIDTH > x >= 0 and HEIGHT > y >= 0:
-            grid.set(x, y, pygame.Color("white"))
+            grid.set(x, y, vary_color(*SAND_HSL))
 
     for col in range(grid.width - 2, -1, -1):
         for row in range(grid.height - 1, -1, -1):
@@ -68,6 +81,8 @@ while running:
     for col in range(grid.width):
         for row in range(grid.height):
             screen.set_at((row, col), grid.get_color(row, col))
+            if grid.get_color(row, col) != 0:
+                print(grid.get_color(row, col))
 
     pygame.display.flip()
     clock.tick(120)
